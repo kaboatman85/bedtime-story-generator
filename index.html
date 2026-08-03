@@ -101,32 +101,26 @@
     </div>
   </div>
 
-  <!-- Import Map for Google Gen AI SDK -->
-  <script type="importmap">
-    {
-      "imports": {
-        "@google/genai": "https://esm.run/@google/genai"
-      }
-    }
-<script>
-  window.generateAIStory = async function() {
-    const name = document.getElementById('heroName').value.trim() || "Brave Explorer";
-    const theme = document.getElementById('theme').value.trim() || "an exciting adventure";
-    const points = document.getElementById('keyPoints').value.trim() || "discovering something wonderful";
-    const verse = document.getElementById('bibleVerse').value.trim() || "Psalm 4:8";
-    const mood = document.getElementById('mood').value;
+  <!-- Main Application Logic (Connecting to Netlify Backend) -->
+  <script>
+    window.generateAIStory = async function() {
+      const name = document.getElementById('heroName').value.trim() || "Brave Explorer";
+      const theme = document.getElementById('theme').value.trim() || "an exciting adventure";
+      const points = document.getElementById('keyPoints').value.trim() || "discovering something wonderful";
+      const verse = document.getElementById('bibleVerse').value.trim() || "Psalm 4:8";
+      const mood = document.getElementById('mood').value;
 
-    const btn = document.getElementById('generateBtn');
-    const loader = document.getElementById('loading');
-    const storyCard = document.getElementById('storyCard');
-    const storyText = document.getElementById('storyText');
+      const btn = document.getElementById('generateBtn');
+      const loader = document.getElementById('loading');
+      const storyCard = document.getElementById('storyCard');
+      const storyText = document.getElementById('storyText');
 
-    btn.disabled = true;
-    btn.classList.add('opacity-50', 'cursor-not-allowed');
-    loader.classList.remove('hidden');
-    storyCard.classList.add('hidden');
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'cursor-not-allowed');
+      loader.classList.remove('hidden');
+      storyCard.classList.add('hidden');
 
-    const prompt = `You are a warm, imaginative children's book author writing a bedtime story for a 4-year-old boy. 
+      const prompt = `You are a warm, imaginative children's book author writing a bedtime story for a 4-year-old boy. 
 Write a complete, beautifully flowing narrative based on these parameters:
 - Main Character / Hero: ${name}
 - Topic / Theme: ${theme}
@@ -139,33 +133,33 @@ Instructions:
 2. Keep the language age-appropriate, engaging, and comforting.
 3. Conclude the story smoothly, transitioning into a peaceful, sleepy wind-down for bedtime so the child is ready to sleep.`;
 
-    try {
-      // Call your secure Netlify backend instead of Google directly
-      const response = await fetch('/.netlify/functions/generateStory', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-      });
+      try {
+        // Call your secure Netlify backend
+        const response = await fetch('/.netlify/functions/generateStory', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate story');
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to generate story');
+        }
+
+        storyText.innerText = data.text;
+        storyCard.classList.remove('hidden');
+        storyCard.scrollIntoView({ behavior: 'smooth' });
+
+      } catch (err) {
+        console.error(err);
+        alert("Error generating story: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        loader.classList.add('hidden');
       }
-
-      storyText.innerText = data.text;
-      storyCard.classList.remove('hidden');
-      storyCard.scrollIntoView({ behavior: 'smooth' });
-
-    } catch (err) {
-      console.error(err);
-      alert("Error generating story: " + err.message);
-    } finally {
-      btn.disabled = false;
-      btn.classList.remove('opacity-50', 'cursor-not-allowed');
-      loader.classList.add('hidden');
-    }
-  };
-</script>
+    };
+  </script>
 </body>
 </html>
