@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bedtime Story Generator</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--accent-color);
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--accent-color);
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .story-output {
+            line-height: 1.6;
+            font-size: 1.1rem;
+            white-space: pre-wrap;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🌙 Bedtime Story Generator</h1>
+        
+        <div class="card">
+            <div class="form-group">
+                <label for="heroName">Hero Name</label>
+                <input type="text" id="heroName" placeholder="e.g., Leo">
+            </div>
+
+            <div class="form-group">
+                <label for="theme">Topic / Theme</label>
+                <input type="text" id="theme" placeholder="e.g., Brave knight defending the castle or flying superhero">
+            </div>
+
+            <div class="form-group">
+                <label for="keyPoints">Key Story Points</label>
+                <textarea id="keyPoints" placeholder="e.g., Finds a glowing shield, helps a lost dragon find its way home"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="lesson">Lesson / Moral</label>
+                <input type="text" id="lesson" placeholder="e.g., Kindness is stronger than armor">
+            </div>
+
+            <div class="form-group">
+                <label for="mood">Mood</label>
+                <select id="mood">
+                    <option value="calming">Calming & Sleepy</option>
+                    <option value="exciting">Fun & Adventurous</option>
+                    <option value="silly">Silly & Playful</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="length">Length</label>
+                <select id="length">
+                    <option value="short">Short (Quick read)</option>
+                    <option value="medium" selected>Medium (Standard bedtime story)</option>
+                </select>
+            </div>
+
+            <button onclick="generateStory()">Generate Story</button>
+        </div>
+
+        <div id="storyCard" class="card hidden">
+            <h3 style="margin-top: 0; color: var(--accent-color);">Your Custom Story</h3>
+            <div id="storyText" class="story-output"></div>
+        </div>
+    </div>
+
+    <script>
+        function generateStory() {
+            const name = document.getElementById('heroName').value.trim() || "Brave Explorer";
+            const theme = document.getElementById('theme').value.trim() || "a magical knight and superhero adventure";
+            const points = document.getElementById('keyPoints').value.trim() || "discovering a magical cape and helping a friend";
+            const lesson = document.getElementById('lesson').value.trim() || "working together makes everything better";
+            const mood = document.getElementById('mood').value;
+            const length = document.getElementById('length').value;
+
+            // Placeholder story generation logic (Ready to hook up to an AI API in the future)
+            let story = `Once upon a time, in a bright and cozy kingdom, lived a wonderful hero named ${name}.\n\n`;
+            story += `${name} loved stories about ${theme}. Tonight, a special adventure began when ${points}.\n\n`;
+            
+            if (mood === 'calming') {
+                story += `With every step, the air grew softer and the stars twinkled a little brighter, wrapping the adventure in a warm, peaceful glow.\n\n`;
+            } else {
+                story += `With a heroic cheer, ${name} faced the challenge with a big smile and a brave heart!\n\n`;
+            }
+
+            story += `Along the way, ${name} discovered that ${lesson}. As the moon climbed high into the sky, our hero settled down for a deep, restful sleep.\n\nGoodnight, ${name}. Sweet dreams.`;
+
+            document.getElementById('storyText').innerText = story;
+            document.getElementById('storyCard').classList.remove('hidden');
+            document.getElementById('storyCard').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
