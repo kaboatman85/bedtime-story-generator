@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bedtime Story Generator</title>
+    <title>AI Bedtime Story Generator</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -55,7 +55,7 @@
             color: #cbd5e1;
         }
 
-        input[type="text"], textarea, select {
+        input[type="text"], input[type="password"], textarea, select {
             width: 100%;
             padding: 10px 12px;
             background-color: #0f172a;
@@ -66,7 +66,7 @@
             box-sizing: border-box;
         }
 
-        input[type="text"]:focus, textarea:focus, select:focus {
+        input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: var(--accent-color);
         }
@@ -93,6 +93,11 @@
             background-color: var(--accent-hover);
         }
 
+        button:disabled {
+            background-color: #475569;
+            cursor: not-allowed;
+        }
+
         .story-output {
             line-height: 1.8;
             font-size: 1.1rem;
@@ -103,143 +108,142 @@
             display: none;
         }
 
-        .verse-callout {
+        .loader {
+            text-align: center;
+            color: var(--accent-color);
             font-style: italic;
-            color: #38bdf8;
-            background: rgba(56, 189, 248, 0.1);
-            padding: 12px 16px;
-            border-left: 4px solid var(--accent-color);
-            border-radius: 0 8px 8px 0;
-            margin-bottom: 20px;
+            margin: 20px 0;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>🌙 Bedtime Story Generator</h1>
+        <h1>🌙 AI Bedtime Story Generator</h1>
         
         <div class="card">
             <div class="form-group">
+                <label for="apiKey">Gemini API Key (<a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--accent-color);">Get a free key</a>)</label>
+                <input type="password" id="apiKey" placeholder="Paste your API key here (saved locally)">
+            </div>
+
+            <div class="form-group">
                 <label for="heroName">Hero Name</label>
-                <input type="text" id="heroName" placeholder="e.g., George">
+                <input type="text" id="heroName" placeholder="e.g., Joshua">
             </div>
 
             <div class="form-group">
                 <label for="theme">Topic / Theme</label>
-                <input type="text" id="theme" placeholder="e.g., A brave knight protecting his family">
+                <input type="text" id="theme" placeholder="e.g., A boy starting at a new school">
             </div>
 
             <div class="form-group">
                 <label for="keyPoints">Key Story Points / Ideas</label>
-                <textarea id="keyPoints" placeholder="e.g., Climbs a mountain, faces a playground challenge"></textarea>
+                <textarea id="keyPoints" placeholder="e.g., Making new friends, learning new things"></textarea>
             </div>
 
             <div class="form-group">
                 <label for="bibleVerse">Bible Verse (Moral / Lesson)</label>
-                <input type="text" id="bibleVerse" placeholder="e.g., Ephesians 6:11 or Joshua 1:9">
+                <input type="text" id="bibleVerse" placeholder="e.g., Psalm 56:3-4">
             </div>
 
             <div class="form-group">
                 <label for="mood">Mood</label>
                 <select id="mood">
-                    <option value="calming">Calming & Sleepy</option>
-                    <option value="exciting">Fun & Adventurous</option>
-                    <option value="silly">Silly & Playful</option>
+                    <option value="calming and sleepy">Calming & Sleepy</option>
+                    <option value="fun and adventurous">Fun & Adventurous</option>
+                    <option value="silly and playful">Silly & Playful</option>
                 </select>
             </div>
 
-            <button onclick="generateStory()">Generate Full Story</button>
+            <button id="generateBtn" onclick="generateAIStory()">Generate AI Story</button>
         </div>
 
+        <div id="loading" class="loader hidden">✨ Crafting a magical story for your son...</div>
+
         <div id="storyCard" class="card hidden">
-            <div id="verseDisplay" class="verse-callout hidden"></div>
             <h3 style="margin-top: 0; color: var(--accent-color);">📖 Bedtime Adventure</h3>
             <div id="storyText" class="story-output"></div>
         </div>
     </div>
 
     <script>
-        const verseDatabase = {
-            "ephesians 6:11": {
-                ref: "Ephesians 6:11",
-                text: "Put on the full armor of God, so that you can take your stand against the devil's schemes.",
-                actualText: true,
-                narrativeIntegration: (name) => `putting on invisible armor of truth and goodness, standing tall and steady with a protected heart`
-            },
-            "joshua 1:9": {
-                ref: "Joshua 1:9",
-                text: "Be strong and courageous... for the Lord your God will be with you wherever you go.",
-                actualText: true,
-                narrativeIntegration: (name) => `feeling completely brave because he knew he was never alone on his journey`
-            },
-            "psalm 4:8": {
-                ref: "Psalm 4:8",
-                text: "In peace I will lie down and sleep, for you alone, Lord, make me dwell in safety.",
-                actualText: true,
-                narrativeIntegration: (name) => `resting in the quiet safety and cozy peace of God's watchful care`
-            },
-            "proverbs 3:5": {
-                ref: "Proverbs 3:5",
-                text: "Trust in the Lord with all your heart and lean not on your own understanding.",
-                actualText: true,
-                narrativeIntegration: (name) => `trusting step-by-step down the right path with complete confidence`
-            }
-        };
+        // Remember API key in browser storage so you don't have to re-paste it every time
+        const apiKeyInput = document.getElementById('apiKey');
+        const savedKey = localStorage.getItem('gemini_story_api_key');
+        if (savedKey) {
+            apiKeyInput.value = savedKey;
+        }
 
-        function generateStory() {
+        apiKeyInput.addEventListener('input', () => {
+            localStorage.setItem('gemini_story_api_key', apiKeyInput.value.trim());
+        });
+
+        async function generateAIStory() {
+            const apiKey = apiKeyInput.value.trim();
+            if (!apiKey) {
+                alert("Please enter your Gemini API key first!");
+                apiKeyInput.focus();
+                return;
+            }
+
             const name = document.getElementById('heroName').value.trim() || "Brave Explorer";
-            const theme = document.getElementById('theme').value.trim() || "an exciting quest";
-            const points = document.getElementById('keyPoints').value.trim() || "embarks on a noble adventure to help others";
-            const rawVerseInput = document.getElementById('bibleVerse').value.trim().toLowerCase();
+            const theme = document.getElementById('theme').value.trim() || "an exciting adventure";
+            const points = document.getElementById('keyPoints').value.trim() || "discovering something wonderful";
+            const verse = document.getElementById('bibleVerse').value.trim() || "Psalm 4:8";
             const mood = document.getElementById('mood').value;
 
-            let selectedVerse = verseDatabase[rawVerseInput];
-            if (!selectedVerse && rawVerseInput !== "") {
-                // Intelligent cleaner for custom-typed verses
-                let customRef = document.getElementById('bibleVerse').value.trim();
-                selectedVerse = {
-                    ref: customRef,
-                    text: `A guiding light of wisdom and truth from ${customRef}.`,
-                    actualText: false,
-                    narrativeIntegration: () => `walking forward with a heart full of faith and strength`
-                };
+            const btn = document.getElementById('generateBtn');
+            const loader = document.getElementById('loading');
+            const storyCard = document.getElementById('storyCard');
+            const storyText = document.getElementById('storyText');
+
+            btn.disabled = true;
+            loader.classList.remove('hidden');
+            storyCard.classList.add('hidden');
+
+            // Crafting the prompt to direct the AI intelligently
+            const prompt = `You are a warm, imaginative children's book author writing a bedtime story for a 4-year-old boy. 
+Write a complete, beautifully flowing narrative based on these parameters:
+- Main Character / Hero: ${name}
+- Topic / Theme: ${theme}
+- Key Plot Elements to weave organically into the plot: ${points}
+- Guiding Bible Verse / Moral to naturally inspire the story's lesson: ${verse}
+- Overall Mood: ${mood}
+
+Instructions:
+1. DO NOT explicitly state things like "the theme is..." or output meta-commentary. Seamlessly weave the plot points and the message of the Bible verse naturally into the narrative events and character actions.
+2. Keep the language age-appropriate, engaging, and comforting.
+3. Conclude the story smoothly, transitioning into a peaceful, sleepy wind-down for bedtime so the child is ready to sleep.`;
+
+            try {
+                // Call Gemini API (gem-1.5-flash is fast and highly creative for text generation)
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }]
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error.message);
+                }
+
+                const generatedText = data.candidates[0].content.parts[0].text;
+                
+                storyText.innerText = generatedText;
+                storyCard.classList.remove('hidden');
+                storyCard.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                alert("Error generating story: " + err.message);
+            } finally {
+                btn.disabled = false;
+                loader.classList.add('hidden');
             }
-
-            // Natural, flowing story structure tailored to read like a real book
-            let story = `Once upon a time, in a bright and peaceful land, lived a wonderful hero named ${name}. ${name} had a warm, loving heart and was always ready to look out for the people he cared about most.\n\n`;
-            
-            story += `Tonight, a special adventure began. The theme of the journey was ${theme}, and it all started when ${name} faced a big moment: ${points}.\n\n`;
-
-            if (selectedVerse) {
-                let integrationText = selectedVerse.narrativeIntegration(name);
-                story += `At first, the challenge looked big, but ${name} took a deep breath, remembered the words of ${selectedVerse.ref}, and imagined himself ${integrationText}.\n\n`;
-            }
-
-            story += `With clever ideas and a gentle, steady spirit, ${name} navigated right through the challenge. Every step he took brought more light, laughter, and goodness to the adventure.\n\n`;
-
-            if (mood === 'calming') {
-                story += `As the adventure gently came to a close, a soft, sleepy evening breeze rolled through the trees. The stars blinked overhead like little night-lights, wrapping the whole world in deep, quiet peace.\n\n`;
-            } else if (mood === 'exciting') {
-                story += `With a triumphant smile and a joyful cheer, ${name} successfully completed the quest, saving the day with courage and a happy heart!\n\n`;
-            } else {
-                story += `With a few playful giggles and lighthearted steps, ${name} wrapped up the journey in the most fun way imaginable.\n\n`;
-            }
-
-            story += `With a proud, happy heart and a job well done, our hero climbed into his warm, cozy bed. The moon shone softly through his window, keeping watch over his sleep.\n\nGoodnight, ${name}. Sweet dreams.`;
-
-            // Display verse block cleanly
-            const verseDisplay = document.getElementById('verseDisplay');
-            if (rawVerseInput !== "" && selectedVerse) {
-                verseDisplay.innerHTML = `<strong>"${selectedVerse.text}"</strong> — <em>${selectedVerse.ref}</em>`;
-                verseDisplay.classList.remove('hidden');
-            } else {
-                verseDisplay.classList.add('hidden');
-            }
-
-            document.getElementById('storyText').innerText = story;
-            document.getElementById('storyCard').classList.remove('hidden');
-            document.getElementById('storyCard').scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
