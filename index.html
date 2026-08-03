@@ -94,8 +94,8 @@
         }
 
         .story-output {
-            line-height: 1.7;
-            font-size: 1.05rem;
+            line-height: 1.8;
+            font-size: 1.1rem;
             white-space: pre-wrap;
         }
 
@@ -122,22 +122,22 @@
         <div class="card">
             <div class="form-group">
                 <label for="heroName">Hero Name</label>
-                <input type="text" id="heroName" placeholder="e.g., Leo">
+                <input type="text" id="heroName" placeholder="e.g., George">
             </div>
 
             <div class="form-group">
                 <label for="theme">Topic / Theme</label>
-                <input type="text" id="theme" placeholder="e.g., A knight fighting for his family">
+                <input type="text" id="theme" placeholder="e.g., A brave knight protecting his family">
             </div>
 
             <div class="form-group">
                 <label for="keyPoints">Key Story Points / Ideas</label>
-                <textarea id="keyPoints" placeholder="e.g., Sister kidnapped by a bad guy, dragon that breathes ice"></textarea>
+                <textarea id="keyPoints" placeholder="e.g., Climbs a mountain, faces a playground challenge"></textarea>
             </div>
 
             <div class="form-group">
                 <label for="bibleVerse">Bible Verse (Moral / Lesson)</label>
-                <input type="text" id="bibleVerse" placeholder="e.g., Joshua 1:9 or Psalm 4:8">
+                <input type="text" id="bibleVerse" placeholder="e.g., Ephesians 6:11 or Joshua 1:9">
             </div>
 
             <div class="form-group">
@@ -161,66 +161,74 @@
 
     <script>
         const verseDatabase = {
+            "ephesians 6:11": {
+                ref: "Ephesians 6:11",
+                text: "Put on the full armor of God, so that you can take your stand against the devil's schemes.",
+                actualText: true,
+                narrativeIntegration: (name) => `putting on invisible armor of truth and goodness, standing tall and steady with a protected heart`
+            },
             "joshua 1:9": {
                 ref: "Joshua 1:9",
                 text: "Be strong and courageous... for the Lord your God will be with you wherever you go.",
-                lessonPhrase: "brave and strong, remembering that he is never alone"
+                actualText: true,
+                narrativeIntegration: (name) => `feeling completely brave because he knew he was never alone on his journey`
             },
             "psalm 4:8": {
                 ref: "Psalm 4:8",
                 text: "In peace I will lie down and sleep, for you alone, Lord, make me dwell in safety.",
-                lessonPhrase: "peaceful rest and safety under God's watchful care"
+                actualText: true,
+                narrativeIntegration: (name) => `resting in the quiet safety and cozy peace of God's watchful care`
             },
             "proverbs 3:5": {
                 ref: "Proverbs 3:5",
                 text: "Trust in the Lord with all your heart and lean not on your own understanding.",
-                lessonPhrase: "trusting completely and following the right path"
-            },
-            "1 corinthians 16:14": {
-                ref: "1 Corinthians 16:14",
-                text: "Do everything in love.",
-                lessonPhrase: "acting with fierce love and kindness"
+                actualText: true,
+                narrativeIntegration: (name) => `trusting step-by-step down the right path with complete confidence`
             }
         };
 
         function generateStory() {
             const name = document.getElementById('heroName').value.trim() || "Brave Explorer";
-            const theme = document.getElementById('theme').value.trim() || "a heroic journey";
-            const points = document.getElementById('keyPoints').value.trim() || "facing a great challenge to protect what matters most";
+            const theme = document.getElementById('theme').value.trim() || "an exciting quest";
+            const points = document.getElementById('keyPoints').value.trim() || "embarks on a noble adventure to help others";
             const rawVerseInput = document.getElementById('bibleVerse').value.trim().toLowerCase();
             const mood = document.getElementById('mood').value;
 
             let selectedVerse = verseDatabase[rawVerseInput];
             if (!selectedVerse && rawVerseInput !== "") {
+                // Intelligent cleaner for custom-typed verses
+                let customRef = document.getElementById('bibleVerse').value.trim();
                 selectedVerse = {
-                    ref: document.getElementById('bibleVerse').value.trim(),
-                    text: "A guiding light of truth and wisdom.",
-                    lessonPhrase: "faith, love, and growing with a strong heart"
+                    ref: customRef,
+                    text: `A guiding light of wisdom and truth from ${customRef}.`,
+                    actualText: false,
+                    narrativeIntegration: () => `walking forward with a heart full of faith and strength`
                 };
             }
 
-            // Crafting a detailed, rich story layout
-            let story = `Once upon a time, in a bright and peaceful land, lived a brave knight named ${name}. ${name} was known far and wide for having a heart full of love, especially when it came to protecting his family.\n\n`;
+            // Natural, flowing story structure tailored to read like a real book
+            let story = `Once upon a time, in a bright and peaceful land, lived a wonderful hero named ${name}. ${name} had a warm, loving heart and was always ready to look out for the people he cared about most.\n\n`;
             
-            story += `Tonight's adventure was a special one about ${theme}. The kingdom was quiet until a sudden challenge arose: ${points}.\n\n`;
+            story += `Tonight, a special adventure began. The theme of the journey was ${theme}, and it all started when ${name} faced a big moment: ${points}.\n\n`;
 
             if (selectedVerse) {
-                story += `Even though things felt uncertain for a moment, ${name} placed his hand over his heart and remembered the promise of ${selectedVerse.ref}. He knew he didn't have to be afraid, because he was ${selectedVerse.lessonPhrase}.\n\n`;
+                let integrationText = selectedVerse.narrativeIntegration(name);
+                story += `At first, the challenge looked big, but ${name} took a deep breath, remembered the words of ${selectedVerse.ref}, and imagined himself ${integrationText}.\n\n`;
             }
 
-            story += `With renewed courage, ${name} stepped forward into the cool evening air. He used cleverness, kindness, and steady steps to navigate through every twist of the journey, turning every obstacle into a moment of triumph.\n\n`;
+            story += `With clever ideas and a gentle, steady spirit, ${name} navigated right through the challenge. Every step he took brought more light, laughter, and goodness to the adventure.\n\n`;
 
             if (mood === 'calming') {
-                story += `As the adventure safely concluded and everything was set right, a gentle, sleepy breeze swept through the trees. The stars began to blink like sleepy eyes, wrapping the whole world in a blanket of quiet peace.\n\n`;
+                story += `As the adventure gently came to a close, a soft, sleepy evening breeze rolled through the trees. The stars blinked overhead like little night-lights, wrapping the whole world in deep, quiet peace.\n\n`;
             } else if (mood === 'exciting') {
-                story += `With a triumphant cheer and a big smile, ${name} successfully completed the mission, saving the day with courage and joy!\n\n`;
+                story += `With a triumphant smile and a joyful cheer, ${name} successfully completed the quest, saving the day with courage and a happy heart!\n\n`;
             } else {
-                story += `With a few giggles and playful maneuvers, ${name} wrapped up the adventure in the most fun way possible.\n\n`;
+                story += `With a few playful giggles and lighthearted steps, ${name} wrapped up the journey in the most fun way imaginable.\n\n`;
             }
 
-            story += `With a happy heart and a job well done, our hero settled down into his cozy bed. The moon shone softly through the window, guarding his sleep.\n\nGoodnight, ${name}. Sweet dreams.`;
+            story += `With a proud, happy heart and a job well done, our hero climbed into his warm, cozy bed. The moon shone softly through his window, keeping watch over his sleep.\n\nGoodnight, ${name}. Sweet dreams.`;
 
-            // Display verse block if provided
+            // Display verse block cleanly
             const verseDisplay = document.getElementById('verseDisplay');
             if (rawVerseInput !== "" && selectedVerse) {
                 verseDisplay.innerHTML = `<strong>"${selectedVerse.text}"</strong> — <em>${selectedVerse.ref}</em>`;
