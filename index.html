@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bedtime Story Generator</title>
+    <title>Bedtime Story Cliff Notes</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -93,10 +93,24 @@
             background-color: var(--accent-hover);
         }
 
-        .story-output {
+        .output-section {
             line-height: 1.6;
-            font-size: 1.1rem;
-            white-space: pre-wrap;
+            font-size: 1.05rem;
+        }
+
+        .output-section h4 {
+            color: var(--accent-color);
+            margin-bottom: 8px;
+            margin-top: 16px;
+        }
+
+        .output-section ul {
+            margin-top: 4px;
+            padding-left: 20px;
+        }
+
+        .output-section li {
+            margin-bottom: 8px;
         }
 
         .hidden {
@@ -117,7 +131,7 @@
 <body>
 
     <div class="container">
-        <h1>🌙 Bedtime Story Generator</h1>
+        <h1>🌙 Bedtime Story Cliff Notes</h1>
         
         <div class="card">
             <div class="form-group">
@@ -131,7 +145,7 @@
             </div>
 
             <div class="form-group">
-                <label for="keyPoints">Key Story Points</label>
+                <label for="keyPoints">Key Story Points / Ideas</label>
                 <textarea id="keyPoints" placeholder="e.g., Finds a glowing shield, helps a lost dragon find its way home"></textarea>
             </div>
 
@@ -149,86 +163,78 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label for="length">Length</label>
-                <select id="length">
-                    <option value="short">Short (Quick read)</option>
-                    <option value="medium" selected>Medium (Standard bedtime story)</option>
-                </select>
-            </div>
-
-            <button onclick="generateStory()">Generate Story</button>
+            <button onclick="generateCliffNotes()">Generate Cliff Notes</button>
         </div>
 
-        <div id="storyCard" class="card hidden">
+        <div id="notesCard" class="card hidden">
             <div id="verseDisplay" class="verse-callout hidden"></div>
-            <h3 style="margin-top: 0; color: var(--accent-color);">Your Custom Story</h3>
-            <div id="storyText" class="story-output"></div>
+            
+            <div class="output-section">
+                <h3 style="margin-top: 0; color: var(--accent-color);">📖 Story Outline</h3>
+                
+                <h4>High-Level Summary</h4>
+                <p id="summaryText"></p>
+
+                <h4>3 Key Story Ideas (Your Roadmap)</h4>
+                <ul id="ideasText"></ul>
+            </div>
         </div>
     </div>
 
     <script>
-        // A built-in mini library of common verses for instant matching, 
-        // with a fallback structure for custom references.
         const verseDatabase = {
             "joshua 1:9": {
                 ref: "Joshua 1:9",
                 text: "Be strong and courageous... for the Lord your God will be with you wherever you go.",
-                themeText: "courage, knowing that he is never alone because bravery comes from a protected heart."
+                themeWord: "courage and knowing he is never alone"
             },
             "psalm 4:8": {
                 ref: "Psalm 4:8",
                 text: "In peace I will lie down and sleep, for you alone, Lord, make me dwell in safety.",
-                themeText: "peaceful rest, safety, and cozy slumber under God's watchful eye."
+                themeWord: "peaceful rest and safety under God's watchful eye"
             },
             "proverbs 3:5": {
                 ref: "Proverbs 3:5",
                 text: "Trust in the Lord with all your heart and lean not on your own understanding.",
-                themeText: "trust, guidance, and following the right path even when things look confusing."
+                themeWord: "trust and following guidance when things are tricky"
             },
             "1 corinthians 16:14": {
                 ref: "1 Corinthians 16:14",
                 text: "Do everything in love.",
-                themeText: "acting with kindness, gentle love, and helping neighbors."
+                themeWord: "acting with kindness and gentle love"
             }
         };
 
-        function generateStory() {
+        function generateCliffNotes() {
             const name = document.getElementById('heroName').value.trim() || "Brave Explorer";
             const theme = document.getElementById('theme').value.trim() || "a magical knight and superhero adventure";
-            const points = document.getElementById('keyPoints').value.trim() || "discovering a glowing shield and helping a friend";
+            const points = document.getElementById('keyPoints').value.trim() || "discovering a glowing tool and helping a friend";
             const rawVerseInput = document.getElementById('bibleVerse').value.trim().toLowerCase();
             const mood = document.getElementById('mood').value;
 
-            // Check if verse matches our lookup database or create a generalized adaptation
             let selectedVerse = verseDatabase[rawVerseInput];
-            
             if (!selectedVerse && rawVerseInput !== "") {
-                // Fallback for custom entered verses
                 selectedVerse = {
                     ref: document.getElementById('bibleVerse').value.trim(),
-                    text: "A special guiding light of truth and wisdom.",
-                    themeText: "faith, goodness, and growing with a strong heart."
+                    text: "A guiding light of truth and wisdom.",
+                    themeWord: "faith and growing with a strong heart"
                 };
             }
 
-            // Build the story text incorporating the verse's underlying theme
-            let story = `Once upon a time, in a bright and cozy kingdom, lived a wonderful hero named ${name}.\n\n`;
-            story += `${name} loved stories about ${theme}. Tonight, a special adventure began when ${points}.\n\n`;
-
+            // Build high-level summary
+            let summary = `A ${mood} adventure starring ${name} as they explore ${theme}. `;
             if (selectedVerse) {
-                story += `During the journey, ${name} remembered the special promise of ${selectedVerse.ref}, learning all about ${selectedVerse.themeText}.\n\n`;
-            }
-
-            if (mood === 'calming') {
-                story += `With every step, the air grew softer and the stars twinkled a little brighter, wrapping the adventure in a warm, peaceful glow.\n\n`;
+                summary += `The journey centers around the theme of ${selectedVerse.themeWord}, tying into ${selectedVerse.ref}.`;
             } else {
-                story += `With a heroic cheer, ${name} faced the challenge with a big smile and a brave heart!\n\n`;
+                summary += `The adventure focuses on ${points}.`;
             }
 
-            story += `As the moon climbed high into the sky, our hero settled down for a deep, restful sleep, safe and sound.\n\nGoodnight, ${name}. Sweet dreams.`;
+            // Build 3 key ideas/cliff notes
+            let idea1 = `<strong>Beginning:</strong> Introduce ${name} in their setting. Set off on the mission involving ${theme}, keeping the mood ${mood}.`;
+            let idea2 = `<strong>Middle (The Challenge):</strong> Incorporate the key plot point (${points}) where ${name} faces a small hurdle or puzzle.`;
+            let idea3 = `<strong>Ending & Wind-Down:</strong> Connect the resolution back to ${selectedVerse ? selectedVerse.ref : 'the day\'s lesson'} and guide ${name} smoothly toward a sleepy, cozy bedtime.`;
 
-            // Display the verse callout block if a verse was given
+            // Display verse callout
             const verseDisplay = document.getElementById('verseDisplay');
             if (rawVerseInput !== "" && selectedVerse) {
                 verseDisplay.innerHTML = `<strong>"${selectedVerse.text}"</strong> — <em>${selectedVerse.ref}</em>`;
@@ -237,9 +243,12 @@
                 verseDisplay.classList.add('hidden');
             }
 
-            document.getElementById('storyText').innerText = story;
-            document.getElementById('storyCard').classList.remove('hidden');
-            document.getElementById('storyCard').scrollIntoView({ behavior: 'smooth' });
+            // Render output
+            document.getElementById('summaryText').innerText = summary;
+            document.getElementById('ideasText').innerHTML = `<li>${idea1}</li><li>${idea2}</li><li>${idea3}</li>`;
+            
+            document.getElementById('notesCard').classList.remove('hidden');
+            document.getElementById('notesCard').scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
