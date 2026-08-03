@@ -102,6 +102,16 @@
         .hidden {
             display: none;
         }
+
+        .verse-callout {
+            font-style: italic;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            padding: 10px 14px;
+            border-left: 4px solid var(--accent-color);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 16px;
+        }
     </style>
 </head>
 <body>
@@ -126,8 +136,8 @@
             </div>
 
             <div class="form-group">
-                <label for="lesson">Lesson / Moral</label>
-                <input type="text" id="lesson" placeholder="e.g., Kindness is stronger than armor">
+                <label for="bibleVerse">Bible Verse (Moral / Lesson)</label>
+                <input type="text" id="bibleVerse" placeholder="e.g., Joshua 1:9 or Psalm 4:8">
             </div>
 
             <div class="form-group">
@@ -151,31 +161,81 @@
         </div>
 
         <div id="storyCard" class="card hidden">
+            <div id="verseDisplay" class="verse-callout hidden"></div>
             <h3 style="margin-top: 0; color: var(--accent-color);">Your Custom Story</h3>
             <div id="storyText" class="story-output"></div>
         </div>
     </div>
 
     <script>
+        // A built-in mini library of common verses for instant matching, 
+        // with a fallback structure for custom references.
+        const verseDatabase = {
+            "joshua 1:9": {
+                ref: "Joshua 1:9",
+                text: "Be strong and courageous... for the Lord your God will be with you wherever you go.",
+                themeText: "courage, knowing that he is never alone because bravery comes from a protected heart."
+            },
+            "psalm 4:8": {
+                ref: "Psalm 4:8",
+                text: "In peace I will lie down and sleep, for you alone, Lord, make me dwell in safety.",
+                themeText: "peaceful rest, safety, and cozy slumber under God's watchful eye."
+            },
+            "proverbs 3:5": {
+                ref: "Proverbs 3:5",
+                text: "Trust in the Lord with all your heart and lean not on your own understanding.",
+                themeText: "trust, guidance, and following the right path even when things look confusing."
+            },
+            "1 corinthians 16:14": {
+                ref: "1 Corinthians 16:14",
+                text: "Do everything in love.",
+                themeText: "acting with kindness, gentle love, and helping neighbors."
+            }
+        };
+
         function generateStory() {
             const name = document.getElementById('heroName').value.trim() || "Brave Explorer";
             const theme = document.getElementById('theme').value.trim() || "a magical knight and superhero adventure";
-            const points = document.getElementById('keyPoints').value.trim() || "discovering a magical cape and helping a friend";
-            const lesson = document.getElementById('lesson').value.trim() || "working together makes everything better";
+            const points = document.getElementById('keyPoints').value.trim() || "discovering a glowing shield and helping a friend";
+            const rawVerseInput = document.getElementById('bibleVerse').value.trim().toLowerCase();
             const mood = document.getElementById('mood').value;
-            const length = document.getElementById('length').value;
 
-            // Placeholder story generation logic (Ready to hook up to an AI API in the future)
+            // Check if verse matches our lookup database or create a generalized adaptation
+            let selectedVerse = verseDatabase[rawVerseInput];
+            
+            if (!selectedVerse && rawVerseInput !== "") {
+                // Fallback for custom entered verses
+                selectedVerse = {
+                    ref: document.getElementById('bibleVerse').value.trim(),
+                    text: "A special guiding light of truth and wisdom.",
+                    themeText: "faith, goodness, and growing with a strong heart."
+                };
+            }
+
+            // Build the story text incorporating the verse's underlying theme
             let story = `Once upon a time, in a bright and cozy kingdom, lived a wonderful hero named ${name}.\n\n`;
             story += `${name} loved stories about ${theme}. Tonight, a special adventure began when ${points}.\n\n`;
-            
+
+            if (selectedVerse) {
+                story += `During the journey, ${name} remembered the special promise of ${selectedVerse.ref}, learning all about ${selectedVerse.themeText}.\n\n`;
+            }
+
             if (mood === 'calming') {
                 story += `With every step, the air grew softer and the stars twinkled a little brighter, wrapping the adventure in a warm, peaceful glow.\n\n`;
             } else {
                 story += `With a heroic cheer, ${name} faced the challenge with a big smile and a brave heart!\n\n`;
             }
 
-            story += `Along the way, ${name} discovered that ${lesson}. As the moon climbed high into the sky, our hero settled down for a deep, restful sleep.\n\nGoodnight, ${name}. Sweet dreams.`;
+            story += `As the moon climbed high into the sky, our hero settled down for a deep, restful sleep, safe and sound.\n\nGoodnight, ${name}. Sweet dreams.`;
+
+            // Display the verse callout block if a verse was given
+            const verseDisplay = document.getElementById('verseDisplay');
+            if (rawVerseInput !== "" && selectedVerse) {
+                verseDisplay.innerHTML = `<strong>"${selectedVerse.text}"</strong> — <em>${selectedVerse.ref}</em>`;
+                verseDisplay.classList.remove('hidden');
+            } else {
+                verseDisplay.classList.add('hidden');
+            }
 
             document.getElementById('storyText').innerText = story;
             document.getElementById('storyCard').classList.remove('hidden');
