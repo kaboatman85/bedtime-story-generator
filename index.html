@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bedtime Story Generator</title>
+  <title>Custom Story Generator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .loader {
@@ -21,8 +21,8 @@
   <div class="max-w-2xl w-full bg-slate-800 rounded-2xl shadow-xl p-6 sm:p-10 border border-slate-700">
     <!-- Header -->
     <header class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-indigo-400 mb-2">✨ Bedtime Story Generator</h1>
-      <p class="text-slate-400 text-sm">Create a personalized, cozy adventure for bedtime.</p>
+      <h1 class="text-3xl font-bold text-indigo-400 mb-2">✨ Custom Story Generator</h1>
+      <p class="text-slate-400 text-sm">Create a personalized adventure for any time of day.</p>
     </header>
 
     <!-- Story Generator Form -->
@@ -73,9 +73,11 @@
           id="mood" 
           class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
+          <option value="Bedtime (Sleepy and Calming)">Bedtime (Sleepy & Calming)</option>
+          <option value="Superhero (Action and Courage)">Superhero (Action & Courage)</option>
+          <option value="Exciting Adventure (Fast-paced and Fun)">Exciting Adventure (Fast-paced & Fun)</option>
           <option value="Peaceful and Calming">Peaceful & Calming</option>
           <option value="Whimsical and Cozy">Whimsical & Cozy</option>
-          <option value="Gentle Adventure">Gentle Adventure</option>
         </select>
       </div>
 
@@ -84,19 +86,19 @@
         id="generateBtn" 
         class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition duration-200 mt-6"
       >
-        Create Bedtime Story 🌙
+        Create Story 📖
       </button>
     </form>
 
     <!-- Loading State -->
     <div id="loading" class="hidden text-center py-8">
       <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-600 h-10 w-10 mx-auto mb-4"></div>
-      <p class="text-slate-400 text-sm">Tucking the stars in and dreaming up a story...</p>
+      <p class="text-slate-400 text-sm">Dreaming up a new adventure...</p>
     </div>
 
     <!-- Output Story Card -->
     <div id="storyCard" class="hidden mt-8 pt-6 border-t border-slate-700">
-      <h2 class="text-xl font-bold text-indigo-300 mb-4">📖 Tonight's Story</h2>
+      <h2 class="text-xl font-bold text-indigo-300 mb-4">📖 Your Story</h2>
       <div id="storyText" class="text-slate-200 leading-relaxed whitespace-pre-wrap space-y-4 mb-6"></div>
     </div>
   </div>
@@ -120,7 +122,7 @@
       loader.classList.remove('hidden');
       storyCard.classList.add('hidden');
 
-      const prompt = `You are a warm, imaginative children's book author writing a bedtime story for a 4-year-old boy. 
+      const prompt = `You are a warm, imaginative children's book author writing a story for a 4-year-old boy. 
 Write a complete, beautifully flowing narrative based on these parameters:
 - Main Character / Hero: ${name}
 - Topic / Theme: ${theme}
@@ -129,9 +131,10 @@ Write a complete, beautifully flowing narrative based on these parameters:
 - Overall Mood: ${mood}
 
 Instructions:
-1. DO NOT explicitly state things like "the theme is..." or output meta-commentary. Seamlessly weave the plot points and the message of the Bible verse naturally into the narrative events and character actions.
-2. Keep the language age-appropriate, engaging, and comforting.
-3. Conclude the story smoothly, transitioning into a peaceful, sleepy wind-down for bedtime so the child is ready to sleep.`;
+1. Start the response with a catchy, creative Title on the very first line, followed by a blank line, and then begin the story.
+2. DO NOT explicitly state things like "the theme is..." or output meta-commentary. Seamlessly weave the plot points and the message of the Bible verse naturally into the narrative events and character actions.
+3. Keep the language age-appropriate, engaging, and comforting.
+4. Adapt the pacing and conclusion of the story to perfectly match the requested Overall Mood (e.g., triumphant and exciting for an adventure, or sleepy and peaceful for bedtime).`;
 
       try {
         // Call your secure Netlify backend
