@@ -103,7 +103,7 @@
     </div>
   </div>
 
-  <!-- Main Application Logic (Connecting to Netlify Backend) -->
+  <!-- Main Application Logic (Connecting to Cloudflare Backend) -->
   <script>
     window.generateAIStory = async function() {
       const name = document.getElementById('heroName').value.trim() || "Brave Explorer";
@@ -137,7 +137,7 @@ Instructions:
 4. Adapt the pacing and conclusion of the story to perfectly match the requested Overall Mood (e.g., triumphant and exciting for an adventure, or sleepy and peaceful for bedtime).`;
 
       try {
-// Call your secure Cloudflare backend
+        // Call your secure Cloudflare backend
         const response = await fetch('/generateStory', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
