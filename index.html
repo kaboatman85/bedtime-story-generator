@@ -137,8 +137,8 @@ Instructions:
 4. Adapt the pacing and conclusion of the story to perfectly match the requested Overall Mood (e.g., triumphant and exciting for an adventure, or sleepy and peaceful for bedtime).`;
 
       try {
-        // Call your secure Netlify backend
-        const response = await fetch('/.netlify/functions/generateStory', {
+// Call your secure Cloudflare backend
+        const response = await fetch('/generateStory', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt })
