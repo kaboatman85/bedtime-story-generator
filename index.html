@@ -97,7 +97,16 @@
     <!-- Output Story Card -->
     <div id="storyCard" class="hidden mt-8 pt-6 border-t border-slate-700">
       <h2 class="text-xl font-bold text-indigo-300 mb-4">📖 Tonight's Story</h2>
-      <div id="storyText" class="text-slate-200 leading-relaxed whitespace-pre-wrap space-y-4"></div>
+      <div id="storyText" class="text-slate-200 leading-relaxed whitespace-pre-wrap space-y-4 mb-6"></div>
+      
+      <!-- New Download Button -->
+      <button 
+        id="downloadBtn" 
+        onclick="window.downloadStory()" 
+        class="w-full sm:w-auto bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 hidden"
+      >
+        💾 Save Story as Text File
+      </button>
     </div>
   </div>
 
@@ -114,11 +123,13 @@
       const loader = document.getElementById('loading');
       const storyCard = document.getElementById('storyCard');
       const storyText = document.getElementById('storyText');
+      const downloadBtn = document.getElementById('downloadBtn');
 
       btn.disabled = true;
       btn.classList.add('opacity-50', 'cursor-not-allowed');
       loader.classList.remove('hidden');
       storyCard.classList.add('hidden');
+      downloadBtn.classList.add('hidden');
 
       const prompt = `You are a warm, imaginative children's book author writing a bedtime story for a 4-year-old boy. 
 Write a complete, beautifully flowing narrative based on these parameters:
@@ -149,6 +160,7 @@ Instructions:
 
         storyText.innerText = data.text;
         storyCard.classList.remove('hidden');
+        downloadBtn.classList.remove('hidden'); // Reveal the download button!
         storyCard.scrollIntoView({ behavior: 'smooth' });
 
       } catch (err) {
@@ -159,6 +171,22 @@ Instructions:
         btn.classList.remove('opacity-50', 'cursor-not-allowed');
         loader.classList.add('hidden');
       }
+    };
+
+    // New Download Function
+    window.downloadStory = function() {
+      const text = document.getElementById('storyText').innerText;
+      const name = document.getElementById('heroName').value.trim() || "Hero";
+      
+      // Create a generic date for the filename
+      const date = new Date().toISOString().split('T')[0];
+      const filename = `${name}_Bedtime_Story_${date}.txt`;
+
+      const blob = new Blob([text], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
     };
   </script>
 </body>
